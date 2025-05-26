@@ -62,29 +62,261 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 
 # Places API
 
-API RESTful para gerenciar lugares.
+API RESTful para gerenciamento de lugares, desenvolvida com Laravel 12 e PostgreSQL.
 
-## Rodando o projeto
+## Requisitos
 
-```sh
+- Docker
+- Docker Compose
+- Git
+
+## Tecnologias Utilizadas
+
+- PHP 8.3
+- Laravel 12
+- PostgreSQL 15
+- Docker
+- Composer
+
+## Estrutura do Projeto
+
+```
+.
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   └── PlaceController.php
+│   │   ├── Requests/
+│   │   │   └── PlaceRequest.php
+│   │   └── Resources/
+│   │       └── PlaceResource.php
+│   └── Models/
+│       └── Place.php
+├── database/
+│   ├── migrations/
+│   │   └── create_places_table.php
+│   ├── factories/
+│   │   └── PlaceFactory.php
+│   └── seeders/
+│       └── PlaceSeeder.php
+├── tests/
+│   └── Feature/
+│       └── PlaceApiTest.php
+├── docker-compose.yml
+└── Dockerfile
+```
+
+## Instalação
+
+1. Clone o repositório:
+```bash
+git clone <url-do-repositorio>
+cd places-api
+```
+
+2. Configure o ambiente:
+```bash
+cp .env.example .env
+```
+
+3. Inicie os containers:
+```bash
 docker-compose up -d --build
+```
+
+4. Instale as dependências:
+```bash
 docker-compose exec app composer install
+```
+
+5. Gere a chave da aplicação:
+```bash
 docker-compose exec app php artisan key:generate
+```
+
+6. Execute as migrações e seeders:
+```bash
 docker-compose exec app php artisan migrate --seed
+```
+
+7. Inicie o servidor:
+```bash
 docker-compose exec app php artisan serve --host=0.0.0.0 --port=8000
 ```
 
+A API estará disponível em `http://localhost:8000`
+
+## Estrutura do Recurso Place
+
+```json
+{
+    "id": 1,
+    "name": "Nome do Lugar",
+    "slug": "nome-do-lugar",
+    "city": "Cidade",
+    "state": "Estado",
+    "created_at": "2024-03-26T00:00:00.000000Z",
+    "updated_at": "2024-03-26T00:00:00.000000Z"
+}
+```
+
+## Endpoints da API
+
+### Listar Lugares
+```http
+GET /api/places
+```
+
+**Parâmetros de Query:**
+- `name` (opcional): Filtra lugares pelo nome
+
+**Exemplo de Resposta:**
+```json
+{
+    "data": [
+        {
+            "id": 1,
+            "name": "Lugar 1",
+            "slug": "lugar-1",
+            "city": "Cidade 1",
+            "state": "SP",
+            "created_at": "2024-03-26T00:00:00.000000Z",
+            "updated_at": "2024-03-26T00:00:00.000000Z"
+        }
+    ]
+}
+```
+
+### Obter Lugar Específico
+```http
+GET /api/places/{id}
+```
+
+**Exemplo de Resposta:**
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "Lugar 1",
+        "slug": "lugar-1",
+        "city": "Cidade 1",
+        "state": "SP",
+        "created_at": "2024-03-26T00:00:00.000000Z",
+        "updated_at": "2024-03-26T00:00:00.000000Z"
+    }
+}
+```
+
+### Criar Lugar
+```http
+POST /api/places
+```
+
+**Corpo da Requisição:**
+```json
+{
+    "name": "Novo Lugar",
+    "city": "Nova Cidade",
+    "state": "SP"
+}
+```
+
+**Exemplo de Resposta:**
+```json
+{
+    "data": {
+        "id": 2,
+        "name": "Novo Lugar",
+        "slug": "novo-lugar",
+        "city": "Nova Cidade",
+        "state": "SP",
+        "created_at": "2024-03-26T00:00:00.000000Z",
+        "updated_at": "2024-03-26T00:00:00.000000Z"
+    }
+}
+```
+
+### Atualizar Lugar
+```http
+PUT /api/places/{id}
+```
+
+**Corpo da Requisição:**
+```json
+{
+    "name": "Lugar Atualizado",
+    "city": "Cidade Atualizada",
+    "state": "RJ"
+}
+```
+
+**Exemplo de Resposta:**
+```json
+{
+    "data": {
+        "id": 1,
+        "name": "Lugar Atualizado",
+        "slug": "lugar-atualizado",
+        "city": "Cidade Atualizada",
+        "state": "RJ",
+        "created_at": "2024-03-26T00:00:00.000000Z",
+        "updated_at": "2024-03-26T00:00:00.000000Z"
+    }
+}
+```
+
+## Validação
+
+- `name`: Obrigatório, string, máximo 255 caracteres
+- `city`: Obrigatório, string, máximo 255 caracteres
+- `state`: Obrigatório, string, máximo 255 caracteres
+
+O campo `slug` é gerado automaticamente a partir do nome.
+
 ## Testes
 
-```sh
+Para executar os testes:
+```bash
 docker-compose exec app php artisan test
 ```
 
-## Endpoints
+Os testes incluem:
+- Listagem de lugares
+- Filtro por nome
+- Obtenção de lugar específico
+- Criação de lugar
+- Atualização de lugar
 
-- `GET /api/places` (filtro por ?name=)
-- `GET /api/places/{id}`
-- `POST /api/places` (name, city, state)
-- `PUT /api/places/{id}` (name, city, state)
+## Desenvolvimento
 
-Todas as respostas são em JSON.
+### Comandos Úteis
+
+- Criar nova migration:
+```bash
+docker-compose exec app php artisan make:migration nome_da_migration
+```
+
+- Criar novo controller:
+```bash
+docker-compose exec app php artisan make:controller NomeController --api
+```
+
+- Criar novo model:
+```bash
+docker-compose exec app php artisan make:model NomeModel -mfs
+```
+
+### Logs
+
+Os logs da aplicação podem ser encontrados em:
+```bash
+docker-compose exec app tail -f storage/logs/laravel.log
+```
+
+## Contribuição
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
