@@ -17,11 +17,10 @@ class Place extends Model
 
     protected static function booted()
     {
-        static::creating(function ($place) {
-            $place->slug = Str::slug($place->name);
-        });
-        static::updating(function ($place) {
-            $place->slug = Str::slug($place->name);
+        static::saving(function ($place) {
+            if (!empty($place->name)) {
+                $place->slug = \Str::slug($place->name);
+            }
         });
     }
 }

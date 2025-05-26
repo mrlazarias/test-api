@@ -16,7 +16,9 @@ class PlaceController extends Controller
     {
         $query = Place::query();
         if ($request->filled('name')) {
-            $query->where('name', 'ilike', '%'.$request->name.'%');
+            $driver = $query->getConnection()->getDriverName();
+            $operator = $driver === 'pgsql' ? 'ilike' : 'like';
+            $query->where('name', $operator, '%'.$request->name.'%');
         }
         return PlaceResource::collection($query->get());
     }
@@ -27,7 +29,7 @@ class PlaceController extends Controller
     public function store(PlaceRequest $request)
     {
         $place = Place::create($request->validated());
-        return new PlaceResource($place);
+        return (new PlaceResource($place))->response()->setStatusCode(201);
     }
 
     /**
